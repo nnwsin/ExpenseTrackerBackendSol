@@ -6,6 +6,7 @@ import com.sol.expensetrackerfinal.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,11 +34,10 @@ public class UserService {
 
     public ResponseEntity<Object> signup(User user) {
         if (user.getEmail() == null || user.getUsername() == null || user.getPassword() == null) {
-            return new ResponseEntity<>("All Fields are Required", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
         }
 
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser != null) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
             return new ResponseEntity<>("User with " + user.getEmail() + " already exists", HttpStatus.CONFLICT);
         }
 
@@ -47,25 +47,38 @@ public class UserService {
     }
 
     public ResponseEntity<Object> login(User user) {
-        User u = userRepository.findByEmail(user.getEmail());
-        if (u == null) {
+        if (user.getEmail() == null || user.getPassword() == null) {
+            return new ResponseEntity<>("Email and password are required", HttpStatus.BAD_REQUEST);
+        }
+
+        User existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser == null) {
             return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        user.getPassword()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            user.getPassword()
+                    )
+            );
 
-        if (authentication.isAuthenticated()) {
-            String token = jwtService.generateToken(u);
-            Map<String, String> response = new HashMap<>();
-            response.put("accessToken", token);
-            return ResponseEntity.ok(response);
+            if (!authentication.isAuthenticated()) {
+                return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            e.printStackTrace(); // For debugging unexpected errors
+            return new ResponseEntity<>("Login failed due to server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Invalid login credentials", HttpStatus.UNAUTHORIZED);
+
+        String token = jwtService.generateToken(existingUser);
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", token);
+        return ResponseEntity.ok(response);
     }
 
     public User profile() {

@@ -1,10 +1,11 @@
 package com.sol.expensetrackerfinal.controller;
 
-import com.expenses.tracker.dto.AddGroupExpenseRequest;
-import com.expenses.tracker.dto.CreateGroupRequest;
-import com.expenses.tracker.dto.GroupWithMemberExpensesDTO;
-import com.expenses.tracker.entity.ExpenseGroup;
-import com.expenses.tracker.service.ExpenseGroupService;
+
+import com.sol.expensetrackerfinal.dto.AddGroupExpenseRequest;
+import com.sol.expensetrackerfinal.dto.CreateGroupRequest;
+import com.sol.expensetrackerfinal.dto.GroupWithMemberExpensesDTO;
+import com.sol.expensetrackerfinal.entities.ExpenseGroup;
+import com.sol.expensetrackerfinal.service.ExpenseGroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

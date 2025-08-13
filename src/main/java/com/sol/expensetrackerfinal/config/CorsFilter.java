@@ -17,7 +17,7 @@ import java.util.List;
 public class CorsFilter implements Filter {
 
     @Value("${frontend.url}")
-    private String frontendUrls; // Can be comma-separated
+    private String frontendUrls;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)

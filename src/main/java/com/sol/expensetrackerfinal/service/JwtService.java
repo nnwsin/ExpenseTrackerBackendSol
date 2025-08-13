@@ -17,8 +17,9 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // Tera naya secret key constant
-    private static final String SECRET_KEY = "C7kdan+gKFKLP98gTKm/g78f4nMmmXWV#+1Zb5tDfDc=";
+    // ✅ Secure Base64-encoded secret key (generated programmatically)
+    // Allowed chars: A–Z, a–z, 0–9, +, /, and =
+    private static final String SECRET_KEY = "q8Cjv+NcKX/Zf7a1h1mch0bZfR4MmtXZd6I9ZEmqfOw=";
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
@@ -45,11 +46,11 @@ public class JwtService {
     }
 
     private <T> T extractClaims(String jwtToken, Function<Claims, T> claimsResolver) {
-        Claims claims = extractClaims(jwtToken);
+        Claims claims = extractAllClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
@@ -61,7 +62,8 @@ public class JwtService {
         if (jwtToken == null || userDetails == null) {
             return false;
         }
-        return (userDetails.getUsername().equals(extractUsername(jwtToken)) &&
-                extractClaims(jwtToken).getExpiration().after(new Date()));
+        String username = extractUsername(jwtToken);
+        return (username.equals(userDetails.getUsername()) &&
+                extractAllClaims(jwtToken).getExpiration().after(new Date()));
     }
 }
