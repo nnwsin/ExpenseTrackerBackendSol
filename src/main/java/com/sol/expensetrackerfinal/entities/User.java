@@ -7,9 +7,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Data // Getters, Setters, toString, equals, hashCode
-@NoArgsConstructor // No-args constructor (JPA requirement)
-@AllArgsConstructor // All-args constructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "app_user")
 public class User {

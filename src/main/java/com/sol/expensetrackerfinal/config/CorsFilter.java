@@ -26,7 +26,7 @@ public class CorsFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        // Support multiple allowed origins
+
         List<String> allowedOrigins = Arrays.asList(frontendUrls.split(","));
         String requestOrigin = request.getHeader("Origin");
 
@@ -34,12 +34,12 @@ public class CorsFilter implements Filter {
             response.setHeader("Access-Control-Allow-Origin", requestOrigin);
         }
 
-        response.setHeader("Vary", "Origin"); // Important for caching
+        response.setHeader("Vary", "Origin");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        // Handle pre-flight OPTIONS request
+
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             return;

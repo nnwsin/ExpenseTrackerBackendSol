@@ -41,6 +41,7 @@ public class InvitationService {
     }
 
     public void sendGroupInvitation(Long groupId, String invitedUserEmail) {
+        System.out.println("[InvitationService] Starting to send invitation email to: " + invitedUserEmail);
         User invitedUser = userRepository.findByEmail(invitedUserEmail);
         if (invitedUser == null) {
             throw new RuntimeException("Invited user not found");
@@ -57,8 +58,10 @@ public class InvitationService {
         invitation.setCreatedAt(LocalDateTime.now());
 
         groupInvitationRepository.save(invitation);
+        System.out.println("[InvitationService] Invitation saved with token: " + token);
+        System.out.println("[InvitationService] Frontend URL: " + frontendUrl);
 
-        String confirmationLink = frontendUrl + "/groups/invites";
+        String confirmationLink = frontendUrl + "/groups/invites?token=" + token;
 
         String subject = "Group Invitation: " + group.getName();
         String body = "You have been invited to join the group \"" + group.getName() + "\".\n"
@@ -68,7 +71,11 @@ public class InvitationService {
         message.setTo(invitedUser.getEmail());
         message.setSubject(subject);
         message.setText(body);
+        System.out.println("[InvitationService] Sending email to: " + invitedUser.getEmail());
+        System.out.println("[InvitationService] Email subject: " + subject);
+        System.out.println("[InvitationService] Email body: " + body);
         mailSender.send(message);
+        System.out.println("[InvitationService] Email sent successfully");
     }
 
     public ResponseEntity<String> confirmGroupInvitation(String token) {
